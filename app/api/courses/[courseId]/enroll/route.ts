@@ -46,8 +46,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cou
     })
 
     return NextResponse.json(enrollment)
-  } catch (error) {
-    console.log('[COURSE_ENROLL]', error)
+  } catch {
     return new NextResponse('Internal server error', { status: 500 })
   }
 }

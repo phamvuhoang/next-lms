@@ -31,8 +31,8 @@ export default function CourseEnrollButton({ price, courseId, isFree = false }: 
         const response = await axios.post(`/api/courses/${courseId}/checkout`)
         window.location.assign(response.data.url)
       }
-    } catch (error: any) {
-      const errorMessage = error?.response?.data || 'Something went wrong!'
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Something went wrong!'
       toast.error(errorMessage)
     } finally {
       setIsLoading(false)
