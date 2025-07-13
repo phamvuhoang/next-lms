@@ -27,6 +27,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ course
         imageUrl: values?.imageUrl,
         categoryId: values?.categoryId,
         price: values?.price,
+        isFree: values?.isFree,
         attachments: values?.attachments,
       },
     })

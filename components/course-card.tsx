@@ -13,6 +13,7 @@ type CourseCardProps = {
   price: number
   progress: number | null
   category: string
+  isFree?: boolean
 }
 
 export default function CourseCard({
@@ -23,6 +24,7 @@ export default function CourseCard({
   price,
   progress,
   category,
+  isFree = false,
 }: CourseCardProps) {
   return (
     <Link href={`/courses/${id}`}>
@@ -48,7 +50,16 @@ export default function CourseCard({
           {progress !== null ? (
             <CourseProgress variant={progress === 100 ? 'success' : 'default'} size="sm" value={progress} />
           ) : (
-            <p className="text-md font-medium text-slate-700 md:text-sm">{formatPrice(price)}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-md font-medium text-slate-700 md:text-sm">
+                {isFree ? 'Free' : formatPrice(price)}
+              </p>
+              {isFree && (
+                <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                  Free
+                </span>
+              )}
+            </div>
           )}
         </div>
       </div>

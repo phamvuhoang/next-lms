@@ -19,6 +19,7 @@ export default function CoursesList({ items }: CoursesListProps) {
             progress={course.progress}
             chaptersLength={course.chapters.length}
             category={course?.category?.name ?? ''}
+            isFree={course.isFree}
           />
         ))}
       </div>

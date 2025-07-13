@@ -10,6 +10,7 @@ import { ImageForm } from './_components/image-form'
 import CategoryForm from './_components/category-form'
 import { PriceForm } from './_components/price-form'
 import { AttachmentForm } from './_components/attachment-form'
+import { CourseAccessForm } from './_components/course-access-form'
 import { ChaptersForm } from './_components/chapters-form'
 import { Banner } from '@/components/banner'
 import Actions from './_components/actions'
@@ -47,7 +48,7 @@ const CourseIdPage = async ({ params }: CourseIdPageProps) => {
     course.title,
     course.description,
     course.imageUrl,
-    course.price,
+    course.isFree || course.price, // Price only required for paid courses
     course.categoryId,
     course.chapters.some((chapter) => chapter.isPublished),
   ]
@@ -87,6 +88,7 @@ const CourseIdPage = async ({ params }: CourseIdPageProps) => {
                 value: category.id,
               }))}
             />
+            <CourseAccessForm initialData={course} courseId={course.id} />
           </div>
           <div className="space-y-6">
             <div>

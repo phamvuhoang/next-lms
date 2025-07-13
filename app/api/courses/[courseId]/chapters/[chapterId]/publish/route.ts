@@ -20,8 +20,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
     const chapter = await db.chapter.findUnique({ where: { id: chapterId, courseId } })
     const muxData = await db.muxData.findUnique({ where: { chapterId } })
 
-    if (![chapter, muxData, chapter?.title, chapter?.description, chapter?.videoUrl].every(Boolean)) {
-      return new NextResponse('Missing required fields', { status: 400 })
+    // Check each required field individually for better error messages
+    if (!chapter) {
+      return new NextResponse('Chapter not found', { status: 404 })
+    }
+
+    if (!chapter.title) {
+      return new NextResponse('Chapter title is required', { status: 400 })
+    }
+
+    if (!chapter.description) {
+      return new NextResponse('Chapter description is required', { status: 400 })
+    }
+
+    if (!chapter.videoUrl) {
+      return new NextResponse('Chapter video is required', { status: 400 })
+    }
+
+    if (!muxData) {
+      return new NextResponse('Video is still processing. Please wait a few minutes and try again.', { status: 400 })
     }
 
     const publishedChapter = await db.chapter.update({

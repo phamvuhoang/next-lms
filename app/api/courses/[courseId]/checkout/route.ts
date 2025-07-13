@@ -17,6 +17,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cou
       return new NextResponse('Course not found!', { status: 404 })
     }
 
+    if (course.isFree) {
+      return new NextResponse('This course is free. Use the enroll endpoint instead.', { status: 400 })
+    }
+
     const purchase = await db.purchase.findUnique({
       where: { userId_courseId: { userId: user.id, courseId: resolvedParams.courseId } },
     })

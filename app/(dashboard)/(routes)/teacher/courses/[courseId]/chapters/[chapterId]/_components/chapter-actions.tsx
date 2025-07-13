@@ -32,8 +32,9 @@ export const ChapterActions = ({ disabled, courseId, chapterId, isPublished }: C
       }
 
       router.refresh()
-    } catch {
-      toast.error('Something went wrong')
+    } catch (error: any) {
+      const errorMessage = error?.response?.data || 'Something went wrong'
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }

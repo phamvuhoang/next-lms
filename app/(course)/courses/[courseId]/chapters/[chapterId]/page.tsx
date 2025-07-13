@@ -67,7 +67,11 @@ export default async function ChapterDetails({ params }: ChapterDetailsProps) {
                 isCompleted={!!userProgress?.isCompleted}
               />
             ) : (
-              <CourseEnrollButton courseId={resolvedParams.courseId} price={course.price!} />
+              <CourseEnrollButton
+                courseId={resolvedParams.courseId}
+                price={course.price!}
+                isFree={course.isFree}
+              />
             )}
           </div>
 

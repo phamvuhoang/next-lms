@@ -22,7 +22,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
     /** Should have a published chapter */
     const hasPublishedChapter = course.chapters.some((chapter) => chapter.isPublished)
 
-    if (!course.title || !course.description || !course.imageUrl || !course.categoryId || !hasPublishedChapter) {
+    // For paid courses, price is required. For free courses, price is not required.
+    const isPriceValid = course.isFree || course.price
+
+    if (!course.title || !course.description || !course.imageUrl || !course.categoryId || !hasPublishedChapter || !isPriceValid) {
       return new NextResponse('Missing required fields', { status: 400 })
     }
 

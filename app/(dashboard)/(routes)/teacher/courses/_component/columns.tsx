@@ -34,12 +34,38 @@ export const columns: ColumnDef<Course>[] = [
     },
     cell: ({ row }) => {
       const price = parseFloat(row.getValue('price') || '0')
+      const isFree = row.original.isFree
+
+      if (isFree) {
+        return <div className="font-medium text-green-600">Free</div>
+      }
+
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
       }).format(price)
 
       return <div>{formatted}</div>
+    },
+  },
+  {
+    accessorKey: 'isFree',
+    header: ({ column }) => {
+      return (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Type
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const isFree = row.getValue('isFree') || false
+
+      return (
+        <Badge className={cn('bg-blue-500', isFree && 'bg-green-500')}>
+          {isFree ? 'Free' : 'Paid'}
+        </Badge>
+      )
     },
   },
   {

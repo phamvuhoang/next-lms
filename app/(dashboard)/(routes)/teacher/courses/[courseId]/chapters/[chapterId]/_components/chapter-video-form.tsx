@@ -85,7 +85,19 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVi
       )}
       {initialData.videoUrl && !isEditing && (
         <div className="mt-2 text-xs text-muted-foreground">
-          Videos can take a few minutes to process. Refresh the page if video does not appear.
+          {!initialData.muxData?.playbackId ? (
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-yellow-500"></div>
+              <span className="text-yellow-600">
+                Video is processing... This can take a few minutes. You cannot publish the chapter until processing is complete.
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-green-500"></div>
+              <span className="text-green-600">Video processed successfully! Chapter is ready to publish.</span>
+            </div>
+          )}
         </div>
       )}
     </div>
