@@ -94,6 +94,11 @@ The assessment system has been fully implemented with quiz and assignment functi
 - Debounced question saving to prevent excessive API calls
 - Real-time question validation and error handling
 
+**Teacher Quiz Management Components:**
+- `app/(dashboard)/(routes)/teacher/courses/[courseId]/_components/quiz-form.tsx`: Quiz management interface for courses and chapters
+- `app/(dashboard)/(routes)/teacher/courses/[courseId]/quizzes/[quizId]/page.tsx`: Individual quiz editing page
+- `app/(dashboard)/(routes)/teacher/courses/[courseId]/quizzes/[quizId]/_components/quiz-question-builder.tsx`: Client-side question builder with debounced saving
+
 **Student Quiz Experience:**
 - Quizzes appear after chapter completion
 - Interactive quiz taking interface
@@ -101,6 +106,7 @@ The assessment system has been fully implemented with quiz and assignment functi
 - XP awarding upon quiz completion
 - Attempt tracking and limits
 - Quiz results and feedback
+- `app/(course)/courses/[courseId]/chapters/[chapterId]/quiz/[quizId]/page.tsx`: Student quiz taking page
 
 **UI Components Setup:**
 - All required shadcn/ui components installed and configured
@@ -139,6 +145,7 @@ The assessment system has been fully implemented with quiz and assignment functi
 - ✅ Complete assessment system with course and chapter quizzes
 - ✅ Frontend integration with all UI components
 - ✅ Student-facing quiz functionality
+- ✅ Teacher quiz management interface
 - ✅ Database migrations
 - ✅ Seed data
 - ✅ Error handling
