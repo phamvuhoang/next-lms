@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import CoursesList from '@/components/course-list'
 import { getDashboardCourses } from '@/actions/get-dashboard-courses'
 import { InfoCard } from './_components/info-card'
+import { DashboardGamification } from '@/components/gamification/dashboard-gamification'
 
 export default async function Dashboard() {
   const { userId } = await auth()
@@ -16,10 +17,16 @@ export default async function Dashboard() {
 
   return (
     <div className="space-y-4 p-6">
+      {/* Gamification Section */}
+      <DashboardGamification />
+      
+      {/* Course Progress Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <InfoCard icon={Clock} label="In Progress" numberOfItems={coursesInProgress.length} />
         <InfoCard icon={CheckCircle} label="Completed" numberOfItems={completedCourses.length} variant="success" />
       </div>
+      
+      {/* Courses List */}
       <CoursesList items={[...coursesInProgress, ...completedCourses]} />
     </div>
   )

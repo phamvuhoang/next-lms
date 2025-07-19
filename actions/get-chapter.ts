@@ -11,7 +11,19 @@ export async function getChapter({ userId, courseId, chapterId }: GetChapterArgs
   try {
     const purchase = await db.purchase.findUnique({ where: { userId_courseId: { userId, courseId } } })
     const course = await db.course.findUnique({ where: { id: courseId, isPublished: true }, select: { price: true, isFree: true } })
-    const chapter = await db.chapter.findUnique({ where: { id: chapterId, isPublished: true } })
+    const chapter = await db.chapter.findUnique({ 
+      where: { id: chapterId, isPublished: true },
+      include: {
+        quizzes: {
+          where: { isPublished: true },
+          include: {
+            _count: {
+              select: { questions: true }
+            }
+          }
+        }
+      }
+    })
 
     if (!chapter || !course) {
       throw new Error('Chapter or course not found!')

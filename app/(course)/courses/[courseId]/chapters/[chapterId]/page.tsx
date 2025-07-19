@@ -9,6 +9,8 @@ import { getChapter } from '@/actions/get-chapter'
 import CourseEnrollButton from './_components/course-enroll-button'
 import { Separator } from '@/components/ui/separator'
 import { CourseProgressButton } from './_components/course-progress-button'
+import { ChapterQuiz } from '@/components/assessments/ChapterQuiz'
+import { Brain } from 'lucide-react'
 
 type Params = Promise<{
   courseId: string
@@ -37,6 +39,7 @@ export default async function ChapterDetails({ params }: ChapterDetailsProps) {
 
   const isLocked = !chapter.isFree && !purchase
   const completedOnEnd = !!purchase && !userProgress?.isCompleted
+  const isCompleted = !!userProgress?.isCompleted
 
   return (
     <div>
@@ -99,6 +102,30 @@ export default async function ChapterDetails({ params }: ChapterDetailsProps) {
               </div>
             </>
           ) : null}
+
+          {/* Quiz Section - Only show if chapter is completed and user has access */}
+          {isCompleted && purchase && chapter.quizzes && chapter.quizzes.length > 0 && (
+            <>
+              <Separator />
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Brain className="h-6 w-6 text-blue-600" />
+                  <h3 className="text-xl font-semibold">Chapter Quiz</h3>
+                </div>
+                <div className="space-y-4">
+                  {chapter.quizzes.map((quiz) => (
+                    <ChapterQuiz
+                      key={quiz.id}
+                      quiz={quiz}
+                      chapterId={resolvedParams.chapterId}
+                      courseId={resolvedParams.courseId}
+                      userId={userId}
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

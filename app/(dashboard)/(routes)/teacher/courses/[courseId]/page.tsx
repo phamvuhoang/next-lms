@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { CircleDollarSign, File, LayoutDashboard, ListChecks } from 'lucide-react'
+import { Brain, CircleDollarSign, File, LayoutDashboard, ListChecks } from 'lucide-react'
 
 import { db } from '@/lib/db'
 import { IconBadge } from '@/components/icon-badge'
@@ -12,6 +12,7 @@ import { PriceForm } from './_components/price-form'
 import { AttachmentForm } from './_components/attachment-form'
 import { CourseAccessForm } from './_components/course-access-form'
 import { ChaptersForm } from './_components/chapters-form'
+import { QuizForm } from './_components/quiz-form'
 import { Banner } from '@/components/banner'
 import Actions from './_components/actions'
 
@@ -31,7 +32,17 @@ const CourseIdPage = async ({ params }: CourseIdPageProps) => {
 
   const course = await db.course.findUnique({
     where: { id: resolvedParams.courseId, createdById: userId },
-    include: { attachments: { orderBy: { createdAt: 'desc' } }, chapters: { orderBy: { position: 'asc' } } },
+    include: { 
+      attachments: { orderBy: { createdAt: 'desc' } }, 
+      chapters: { orderBy: { position: 'asc' } },
+      quizzes: {
+        include: {
+          _count: {
+            select: { questions: true }
+          }
+        }
+      }
+    },
   })
 
   if (!course) {
@@ -97,6 +108,13 @@ const CourseIdPage = async ({ params }: CourseIdPageProps) => {
                 <h2 className="text-xl">Course chapters</h2>
               </div>
               <ChaptersForm initialData={course} courseId={course.id} />
+            </div>
+            <div>
+              <div className="flex items-center gap-x-2">
+                <IconBadge icon={Brain} />
+                <h2 className="text-xl">Course quizzes</h2>
+              </div>
+              <QuizForm initialData={course} courseId={course.id} />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
