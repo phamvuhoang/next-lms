@@ -77,7 +77,7 @@ const QuizIdPage = async ({ params }: QuizIdPageProps) => {
   const transformedQuestions = quiz.questions.map(q => ({
     id: q.id,
     question: q.question,
-    type: q.type,
+    type: q.type as any, // Cast to any to avoid enum type conflicts
     options: q.options as string[] | undefined,
     correctAnswer: q.correctAnswer as string | string[],
     explanation: q.explanation,

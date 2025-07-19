@@ -140,7 +140,7 @@ export async function POST(
     // Award XP if quiz is passed
     const passed = gradingResult.score >= quiz.passingScore;
     let xpAwarded = 0;
-    let newAchievements = [];
+    const newAchievements = [];
 
     if (passed) {
       try {

@@ -3,11 +3,12 @@ import { db } from "@/lib/db";
 
 export async function GET(
   req: Request,
-  { params }: { params: { assignmentId: string } }
+  { params }: { params: Promise<{ assignmentId: string }> }
 ) {
   try {
+    const { assignmentId } = await params;
     const assignment = await db.assignment.findUnique({
-      where: { id: params.assignmentId },
+      where: { id: assignmentId },
       include: { submissions: true },
     });
 

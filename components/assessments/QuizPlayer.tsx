@@ -7,12 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-
 enum QuestionType {
   MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
   TRUE_FALSE = "TRUE_FALSE",

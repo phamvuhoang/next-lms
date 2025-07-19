@@ -5,14 +5,14 @@ import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { v4 as uuidv4 } from 'uuid'
 
-export async function POST(req: Request, { params }: { params: { courseId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ courseId: string }> }) {
   try {
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const courseId = params.courseId
+    const { courseId } = await params
 
     // 1. Check if certificate already exists
     const existingCertificate = await db.certificate.findUnique({
@@ -74,14 +74,14 @@ export async function POST(req: Request, { params }: { params: { courseId: strin
   }
 }
 
-export async function GET(req: Request, { params }: { params: { courseId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ courseId: string }> }) {
   try {
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const courseId = params.courseId
+    const { courseId } = await params
 
     const certificate = await db.certificate.findUnique({
       where: {

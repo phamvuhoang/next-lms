@@ -94,10 +94,10 @@ export const DashboardGamification = () => {
         {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader className="pb-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-gray-200 rounded w-full"></div>
+              <div className="h-8 bg-gray-200 rounded w-full" />
             </CardContent>
           </Card>
         ))}
@@ -138,7 +138,7 @@ export const DashboardGamification = () => {
                     style={{ 
                       width: `${(xpData.currentLevelXP / (xpData.currentLevelXP + xpData.xpToNextLevel)) * 100}%` 
                     }}
-                  ></div>
+                  />
                 </div>
               </div>
             )}
@@ -190,6 +190,7 @@ export const DashboardGamification = () => {
         </Card>
 
         {/* Daily Goal Card */}
+        {/* eslint-disable-next-line react/self-closing-comp */}
         <DailyGoalDisplay />
       </div>
 

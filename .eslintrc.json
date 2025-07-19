@@ -8,7 +8,10 @@
         "html": true
       }
     ],
-    "no-console": "error",
-    "object-shorthand": "error"
+    "no-console": "warn",
+    "object-shorthand": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }

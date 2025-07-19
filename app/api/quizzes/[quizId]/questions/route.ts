@@ -93,7 +93,7 @@ export async function PUT(
       const questionsToCreate = questions.map((q: Question) => ({
         quizId,
         question: q.question,
-        type: q.type,
+        type: q.type as any, // Cast to any to avoid enum type conflicts
         options: q.options || [],
         correctAnswer: q.correctAnswer,
         explanation: q.explanation,

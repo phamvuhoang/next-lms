@@ -36,7 +36,7 @@ export const Leaderboard = () => {
   }, [timeframe]);
 
   return (
-    <Tabs defaultValue="all-time" onValueChange={(value) => setTimeframe(value as any)}>
+    <Tabs defaultValue="all-time" onValueChange={(value: string) => setTimeframe(value as 'weekly' | 'monthly' | 'all-time')}>
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="weekly">Weekly</TabsTrigger>
         <TabsTrigger value="monthly">Monthly</TabsTrigger>

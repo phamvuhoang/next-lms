@@ -5,15 +5,16 @@ import { CertificateDisplay } from "@/components/gamification/CertificateDisplay
 import { redirect } from "next/navigation";
 
 interface CertPageProps {
-  params: {
+  params: Promise<{
     verificationCode: string;
-  };
+  }>;
 }
 
 const CertPage = async ({ params }: CertPageProps) => {
+  const { verificationCode } = await params;
   const certificate = await db.certificate.findUnique({
     where: {
-      verificationCode: params.verificationCode,
+      verificationCode,
     },
     include: {
       course: {
@@ -34,6 +35,7 @@ const CertPage = async ({ params }: CertPageProps) => {
   const certificateData = {
     ...certificate,
     user,
+    issuedAt: certificate.issuedAt.toISOString(),
   };
 
   return (

@@ -3,15 +3,25 @@
 import { useCallback, useEffect, useState } from 'react'
 import { QuestionBuilder } from '@/components/assessments/QuestionBuilder'
 
-interface QuizQuestion {
-  id?: string
-  question: string
-  type: string
-  options?: string[]
-  correctAnswer: string | string[]
-  explanation?: string | null
-  points: number
-  order: number
+// Use the same enum as QuestionBuilder
+enum QuestionType {
+  MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
+  TRUE_FALSE = "TRUE_FALSE",
+  FILL_IN_THE_BLANK = "FILL_IN_THE_BLANK",
+}
+
+interface Question {
+  id?: string;
+  question: string;
+  type: QuestionType;
+  options?: string[];
+  correctAnswer: string | string[];
+  points: number;
+  order: number;
+}
+
+interface QuizQuestion extends Question {
+  explanation?: string | null;
 }
 
 interface QuizQuestionBuilderProps {

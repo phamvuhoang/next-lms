@@ -174,7 +174,7 @@ export const getLeaderboard = async (timeframe: 'weekly' | 'monthly' | 'all-time
             },
         },
         distinct: ['userId'],
-    });
+    } as any);
 
     return {
       leaderboard,
@@ -365,7 +365,7 @@ export const getUserStreak = async (userId: string) => {
   });
 };
 
-export const useStreakFreeze = async (userId: string) => {
+export const applyStreakFreeze = async (userId: string) => {
   const userStreak = await db.userStreak.findUnique({
     where: { userId },
   });

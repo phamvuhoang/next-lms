@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { useStreakFreeze } from "@/lib/services/gamification.service";
+import { applyStreakFreeze } from "@/lib/services/gamification.service";
 
 export async function POST(
   req: Request,
@@ -19,7 +19,7 @@ export async function POST(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    const updatedStreak = await useStreakFreeze(userId);
+    const updatedStreak = await applyStreakFreeze(userId);
 
     return NextResponse.json({
       success: true,
