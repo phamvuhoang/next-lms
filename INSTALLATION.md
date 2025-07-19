@@ -8,7 +8,7 @@ Before you begin, ensure you have the following installed on your system:
 
 - **Node.js** (v18.13.0 or higher) - [Download here](https://nodejs.org/)
 - **pnpm** (recommended package manager) - Install with: `npm install -g pnpm`
-- **PostgreSQL** (already installed with default options)
+- **PostgreSQL** (already installed with default options) or **Docker**
 - **Git** - [Download here](https://git-scm.com/)
 
 ## Project Setup
@@ -32,13 +32,15 @@ This will install all required dependencies and automatically run `prisma genera
 
 ### 3. Configure PostgreSQL
 
-Since PostgreSQL is already installed with default options, you should have:
+You have two options for setting up the database:
+
+#### Option A: Local PostgreSQL Installation
+
+If you have PostgreSQL installed locally, ensure it's running and you can connect to it. The default connection details are:
 - **Host**: localhost
 - **Port**: 5432
 - **Username**: postgres
 - **Password**: postgres (or your chosen password)
-
-### 4. Create Database
 
 Connect to PostgreSQL and create the database:
 
@@ -53,22 +55,22 @@ CREATE DATABASE "next-lms";
 \q
 ```
 
-Alternatively, you can use the provided Docker Compose setup:
+#### Option B: Docker Compose (Recommended)
+
+The easiest way to get started is to use the provided Docker Compose setup. This will create a PostgreSQL container and a separate Adminer container for database management.
 
 ```bash
-# Start PostgreSQL with Docker
-docker-compose up -d postgres
+# Start PostgreSQL and Adminer with Docker
+docker-compose up -d
 ```
 
-This will create a PostgreSQL container with:
-- Database: `next-lms`
-- Username: `postgres`
-- Password: `postgres`
-- Port: `5432`
+This will create two services:
+- **PostgreSQL**: A PostgreSQL container with the database `next-lms`, username `postgres`, and password `postgres`, available on port `5432`.
+- **Adminer**: A web-based database management tool available at `http://localhost:8080`.
 
 ## Environment Configuration
 
-### 5. Set Up Environment Variables
+### 4. Set Up Environment Variables
 
 Copy the example environment file and configure it:
 
@@ -76,210 +78,84 @@ Copy the example environment file and configure it:
 cp .env.example .env
 ```
 
-Edit the `.env` file with your configuration:
+Edit the `.env` file with your configuration. See the `.env.example` file for a full list of required and optional variables.
 
-```env
-# Database Configuration
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/next-lms"
-
-# Clerk Authentication (Required)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
-CLERK_SECRET_KEY=your_clerk_secret_key_here
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
-
-# Application URL
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Teacher ID (Set this to your Clerk user ID to access teacher features)
-NEXT_PUBLIC_TEACHER_ID=your_clerk_user_id
-
-# UploadThing Configuration (Required for file uploads)
-UPLOADTHING_TOKEN=your_uploadthing_token_here
-
-# Mux Configuration (Required for video processing)
-MUX_TOKEN_ID=your_mux_token_id
-MUX_TOKEN_SECRET=your_mux_token_secret
-
-# Stripe Configuration (Required for payments)
-STRIPE_API_KEY=your_stripe_api_key
-STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
-```
+**Important:** To access the teacher dashboard, you must set the `NEXT_PUBLIC_TEACHER_ID` to your Clerk user ID.
 
 ## External Services Setup
 
-### 6. Clerk Authentication Setup
+### 5. Configure External Services
 
-1. Go to [Clerk Dashboard](https://dashboard.clerk.com/)
-2. Create a new application
-3. Copy the publishable key and secret key
-4. Configure sign-in/sign-up URLs in Clerk dashboard:
-   - Sign-in URL: `/sign-in`
-   - Sign-up URL: `/sign-up`
-   - After sign-in URL: `/`
-   - After sign-up URL: `/`
+This project relies on several external services for key features. You will need to create accounts and obtain API keys for the following:
 
-### 7. UploadThing Setup
+- **Clerk:** For user authentication.
+- **UploadThing:** For file uploads (course images, attachments, etc.).
+- **Mux:** For video processing and streaming.
+- **Stripe:** For payment processing.
 
-1. Go to [UploadThing Dashboard](https://uploadthing.com/)
-2. Create a new project
-3. Copy the token from your project settings
-4. The app supports uploading:
-   - Course images (max 4MB)
-   - Course attachments (text, image, video, audio, PDF)
-   - Chapter videos (max 512GB)
-
-### 8. Mux Setup (Video Processing)
-
-1. Go to [Mux Dashboard](https://dashboard.mux.com/)
-2. Create a new project
-3. Generate API access tokens
-4. Copy the Token ID and Token Secret
-
-### 9. Stripe Setup (Payments)
-
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com/)
-2. Get your API keys from the Developers section
-3. Set up webhooks:
-   - Endpoint URL: `http://localhost:3000/api/webhook`
-   - Events to listen for: `checkout.session.completed`
-   - Copy the webhook secret
+Follow the instructions in the `.env.example` file to configure the API keys for each service.
 
 ## Database Migration and Seeding
 
-### 10. Run Database Migrations
+### 6. Run Database Migrations
 
 ```bash
 # Apply all pending migrations
 pnpm dlx prisma migrate deploy
-
-# Or reset the database and apply migrations
-pnpm dlx prisma migrate reset
 ```
 
-### 11. Seed the Database
+### 7. Seed the Database
 
 ```bash
-# Run the seed script to populate categories
+# Run the seed script to populate categories and achievements
 pnpm dlx tsx scripts/seed.ts
 ```
 
-This will create the following course categories:
-- Computer Science
-- Music
-- Fitness
-- Photography
-- Accounting
-- Engineering
-- Filming
+This will create the initial course categories and the available achievements for the gamification system.
 
 ## Running the Application
 
-### 12. Start the Development Server
+### 8. Start the Development Server
 
 ```bash
 pnpm dev
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000)
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-### 13. Access the Application
+### 9. Accessing the Application
 
-1. **Student View**: Navigate to `http://localhost:3000`
-2. **Teacher View**: 
-   - Sign up/Sign in with Clerk
-   - Set your Clerk user ID as `NEXT_PUBLIC_TEACHER_ID` in `.env`
-   - Access teacher features at `http://localhost:3000/teacher`
-
-## Project Structure
-
-```
-next-lms/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication pages
-│   ├── (course)/          # Course-related pages
-│   ├── (dashboard)/       # Dashboard pages
-│   └── api/               # API routes
-├── components/            # Reusable React components
-├── lib/                   # Utility functions and configurations
-├── prisma/               # Database schema and migrations
-├── scripts/              # Database seeding scripts
-└── public/               # Static assets
-```
-
-## Available Scripts
-
-```bash
-# Development
-pnpm dev                   # Start development server
-
-# Production
-pnpm build                 # Build for production
-pnpm start                 # Start production server
-
-# Database
-pnpm dlx prisma studio     # Open Prisma Studio (database GUI)
-pnpm dlx prisma migrate dev # Create and apply new migration
-pnpm dlx prisma generate   # Generate Prisma client
-
-# Code Quality
-pnpm lint                  # Run ESLint
-```
+- **Student View**: Navigate to `http://localhost:3000` and sign up or sign in.
+- **Teacher View**: To access the teacher dashboard, ensure your Clerk user ID is set as the `NEXT_PUBLIC_TEACHER_ID` in your `.env` file. Then, navigate to `http://localhost:3000/teacher`.
 
 ## Features
 
-- **Authentication**: Secure user authentication with Clerk
-- **Course Management**: Create, edit, and publish courses
-- **Chapter Management**: Organize course content into chapters
-- **Video Upload**: Upload and process videos with Mux
-- **File Attachments**: Upload course materials
-- **Payment Processing**: Stripe integration for course purchases
-- **Progress Tracking**: Track student progress through courses
-- **Analytics**: Course analytics and reporting
-- **Responsive Design**: Mobile-friendly interface
+This project is an enhanced Learning Management System (LMS) with a focus on gamification and modern assessment tools.
+
+### Core LMS Features
+
+- **Course Management:** Create, edit, and publish courses with chapters.
+- **Content Delivery:** Video-based learning with Mux integration.
+- **Progress Tracking:** Track user progress through chapters and courses.
+- **Authentication:** Secure user authentication with Clerk.
+- **Payment System:** Stripe integration for paid courses.
+- **Free Courses:** Support for free course enrollment.
+
+### Gamification
+
+- **XP (Experience Points) System:** Users earn XP for completing learning activities, such as finishing chapters and quizzes.
+- **Leveling System:** Users level up based on their total XP, with visual progress indicators.
+- **Achievements:** Users can unlock a variety of achievements for reaching milestones, categorized into Learning, Consistency, and Excellence.
+- **Streaks:** Daily learning streaks are tracked to encourage consistent study habits. A "streak freeze" feature is available.
+- **Leaderboards:** Time-based leaderboards (weekly, monthly, all-time) to foster friendly competition.
+- **Daily Goals:** Users have daily XP goals to encourage regular engagement.
+
+### Enhanced Assessment System
+
+- **Quiz Engine:** Teachers can create quizzes with various question types, including multiple-choice, true/false, and fill-in-the-blank.
+- **Assignments:** Teachers can create assignments with deadlines and grading rubrics.
+- **Certification:** Upon course completion, users can claim a verifiable certificate.
 
 ## Troubleshooting
 
-### Common Issues
-
-1. **Database Connection Error**
-   - Ensure PostgreSQL is running
-   - Check DATABASE_URL in .env file
-   - Verify database exists
-
-2. **Prisma Client Error**
-   - Run `pnpm dlx prisma generate`
-   - Check if migrations are applied
-
-3. **Authentication Issues**
-   - Verify Clerk keys in .env
-   - Check Clerk dashboard configuration
-
-4. **File Upload Issues**
-   - Verify UploadThing token
-   - Check file size limits
-
-5. **Video Processing Issues**
-   - Verify Mux credentials
-   - Check video file format
-
-### Getting Help
-
-- Check the [Next.js Documentation](https://nextjs.org/docs)
-- Review [Prisma Documentation](https://www.prisma.io/docs)
-- Visit [Clerk Documentation](https://clerk.com/docs)
-
-## Next Steps
-
-After successful installation:
-
-1. Create your first course as a teacher
-2. Add chapters and content
-3. Test the payment flow with Stripe test mode
-4. Customize the application to your needs
-
----
-
-**Note**: This is a development setup. For production deployment, additional configuration for security, performance, and scalability will be required.
+If you encounter any issues during setup, please refer to the "Troubleshooting" section in the original `README.md` file, or consult the documentation for the respective external services.

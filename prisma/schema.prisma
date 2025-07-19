@@ -207,10 +207,16 @@ model Quiz {
   @@index([courseId])
 }
 
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  FILL_IN_THE_BLANK
+}
+
 model Question {
   id            String   @id @default(cuid())
   quizId        String
-  type          String
+  type          QuestionType @default(MULTIPLE_CHOICE)
   question      String
   options       Json?
   correctAnswer Json
@@ -247,6 +253,7 @@ model Assignment {
   courseId            String?
   dueDate             DateTime?
   maxPoints           Int      @default(100)
+  rubric              Json?    // Add this line
   allowLateSubmission Boolean  @default(true)
   isPublished         Boolean  @default(false)
   xpReward            Int      @default(50)
@@ -275,6 +282,17 @@ model AssignmentSubmission {
   assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
 
   @@unique([userId, assignmentId])
+}
+
+model DailyGoal {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime @db.Date
+  targetXP    Int
+  currentXP   Int      @default(0)
+  isCompleted Boolean  @default(false)
+
+  @@unique([userId, date])
 }
 
 model Certificate {

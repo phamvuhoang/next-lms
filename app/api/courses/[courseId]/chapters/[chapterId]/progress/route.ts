@@ -30,6 +30,7 @@ export async function PUT(req: NextRequest, { params }: { params: Progress }) {
     })
 
     // Award XP if chapter is being completed for the first time
+    let xpResult = null;
     if (isCompleted && (!existingProgress || !existingProgress.isCompleted)) {
       try {
         // Get chapter data to determine XP reward
@@ -39,7 +40,7 @@ export async function PUT(req: NextRequest, { params }: { params: Progress }) {
         })
 
         if (chapter) {
-          await awardXP(
+          xpResult = await awardXP(
             userId, 
             chapter.xpReward, 
             `Completed chapter: ${chapter.title}`, 
@@ -53,7 +54,7 @@ export async function PUT(req: NextRequest, { params }: { params: Progress }) {
       }
     }
 
-    return NextResponse.json(userProgress)
+    return NextResponse.json({ ...userProgress, ...xpResult })
   } catch (error) {
     console.error('[PROGRESS_UPDATE_ERROR]', error)
     return new NextResponse('Internal server error', { status: 500 })

@@ -7,10 +7,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, Trash } from "lucide-react";
 
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PlusCircle, Trash } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+
+enum QuestionType {
+  MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
+  TRUE_FALSE = "TRUE_FALSE",
+  FILL_IN_THE_BLANK = "FILL_IN_THE_BLANK",
+}
+
 interface Question {
   id?: string;
   question: string;
-  type: string;
+  type: QuestionType;
   options?: string[];
   correctAnswer: string | string[];
   points: number;
@@ -29,7 +44,7 @@ export const QuestionBuilder = ({ initialQuestions = [], onQuestionsChange, isLo
   const addQuestion = () => {
     const newQuestion: Question = {
       question: "",
-      type: "multiple_choice",
+      type: QuestionType.MULTIPLE_CHOICE,
       options: ["Option 1", "Option 2"],
       correctAnswer: "Option 1",
       points: 1,
@@ -120,14 +135,14 @@ export const QuestionBuilder = ({ initialQuestions = [], onQuestionsChange, isLo
                 <SelectValue placeholder="Select a type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="multiple_choice">Multiple Choice</SelectItem>
-                <SelectItem value="true_false">True/False</SelectItem>
-                <SelectItem value="fill_blank">Fill-in-the-blank</SelectItem>
+                <SelectItem value={QuestionType.MULTIPLE_CHOICE}>Multiple Choice</SelectItem>
+                <SelectItem value={QuestionType.TRUE_FALSE}>True/False</SelectItem>
+                <SelectItem value={QuestionType.FILL_IN_THE_BLANK}>Fill-in-the-blank</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {q.type === "multiple_choice" && (
+          {q.type === QuestionType.MULTIPLE_CHOICE && (
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">Options</label>
               {q.options?.map((option, oIndex) => (
@@ -151,7 +166,7 @@ export const QuestionBuilder = ({ initialQuestions = [], onQuestionsChange, isLo
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Correct Answer</label>
-            {q.type === "multiple_choice" ? (
+            {q.type === QuestionType.MULTIPLE_CHOICE ? (
               <Select
                 value={q.correctAnswer as string}
                 onValueChange={(value) => updateQuestion(qIndex, "correctAnswer", value)}
@@ -168,6 +183,21 @@ export const QuestionBuilder = ({ initialQuestions = [], onQuestionsChange, isLo
                   ))}
                 </SelectContent>
               </Select>
+            ) : q.type === QuestionType.TRUE_FALSE ? (
+              <RadioGroup
+                value={q.correctAnswer as string}
+                onValueChange={(value) => updateQuestion(qIndex, "correctAnswer", value)}
+                disabled={isLoading}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="true" id={`true-${qIndex}`} />
+                  <Label htmlFor={`true-${qIndex}`}>True</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="false" id={`false-${qIndex}`} />
+                  <Label htmlFor={`false-${qIndex}`}>False</Label>
+                </div>
+              </RadioGroup>
             ) : (
               <Input
                 value={q.correctAnswer as string}
@@ -195,4 +225,3 @@ export const QuestionBuilder = ({ initialQuestions = [], onQuestionsChange, isLo
       </Button>
     </div>
   );
-};

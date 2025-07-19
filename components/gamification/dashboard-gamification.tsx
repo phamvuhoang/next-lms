@@ -40,11 +40,14 @@ interface UserAchievement {
   achievement: Achievement;
 }
 
+import { DailyGoalDisplay } from "./DailyGoalDisplay";
+
 export const DashboardGamification = () => {
   const { user } = useUser();
   const [xpData, setXpData] = useState<UserXPData | null>(null);
   const [streakData, setStreakData] = useState<UserStreak | null>(null);
   const [achievements, setAchievements] = useState<UserAchievement[]>([]);
+  const [progressTowards, setProgressTowards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,6 +76,7 @@ export const DashboardGamification = () => {
         if (achievementsResponse.ok) {
           const achievementsResult = await achievementsResponse.json();
           setAchievements(achievementsResult.unlockedAchievements || []);
+          setProgressTowards(achievementsResult.progressTowards || []);
         }
       } catch (error) {
         console.error('Error fetching gamification data:', error);
@@ -185,25 +189,32 @@ export const DashboardGamification = () => {
           </CardContent>
         </Card>
 
-        {/* Quick Action Card */}
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-700">Today's Goal</CardTitle>
-            <Target className="h-4 w-4 text-green-600" />
+        {/* Daily Goal Card */}
+        <DailyGoalDisplay />
+      </div>
+
+      {/* Achievements In Progress */}
+      {progressTowards.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Target className="h-5 w-5 text-blue-600" />
+              Achievements in Progress
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-900">
-              50 XP
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {progressTowards.map((progress) => (
+                <AchievementBadge
+                  key={progress.achievementId}
+                  achievement={progress.achievement}
+                  progress={progress}
+                />
+              ))}
             </div>
-            <p className="text-xs text-green-600 mb-2">
-              Complete 1 chapter
-            </p>
-            <Button size="sm" className="w-full bg-green-600 hover:bg-green-700 text-xs">
-              Start Learning
-            </Button>
           </CardContent>
         </Card>
-      </div>
+      )}
 
       {/* Recent Achievements */}
       {recentAchievements.length > 0 && (

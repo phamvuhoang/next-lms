@@ -53,6 +53,7 @@ export default async function ChapterDetails({ params }: ChapterDetailsProps) {
             title={chapter.title}
             courseId={resolvedParams.courseId}
             nextChapterId={nextChapter?.id}
+            quizId={chapter.quizzes[0]?.id}
             playbackId={muxData?.playbackId ?? ''}
             isLocked={isLocked}
             completeOnEnd={completedOnEnd}

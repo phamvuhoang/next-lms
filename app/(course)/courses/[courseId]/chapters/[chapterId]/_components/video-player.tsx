@@ -15,6 +15,7 @@ interface VideoPlayerProps {
   courseId: string
   chapterId: string
   nextChapterId?: string
+  quizId?: string
   isLocked: boolean
   completeOnEnd: boolean
   title: string
@@ -25,6 +26,7 @@ export const VideoPlayer = ({
   courseId,
   chapterId,
   nextChapterId,
+  quizId,
   isLocked,
   completeOnEnd,
   title,
@@ -36,18 +38,27 @@ export const VideoPlayer = ({
   const onEnd = async () => {
     try {
       if (completeOnEnd) {
-        await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
-          isCompleted: true,
-        })
+        const response = await axios.put(
+          `/api/courses/${courseId}/chapters/${chapterId}/progress`,
+          {
+            isCompleted: true,
+          },
+        )
 
-        if (!nextChapterId) {
+        if (response.data.levelUp) {
+          confetti.onOpen()
+        }
+
+        if (!nextChapterId && !quizId) {
           confetti.onOpen()
         }
 
         toast.success('Progress updated')
         router.refresh()
 
-        if (nextChapterId) {
+        if (quizId) {
+          router.push(`/courses/${courseId}/chapters/${chapterId}/quiz/${quizId}`)
+        } else if (nextChapterId) {
           router.push(`/courses/${courseId}/chapters/${nextChapterId}`)
         }
       }

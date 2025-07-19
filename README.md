@@ -1,5 +1,33 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Features
+
+This project is an enhanced Learning Management System (LMS) with a focus on gamification and modern assessment tools. The features are inspired by successful platforms like Duolingo, Khan Academy, and Coursera.
+
+### Core LMS Features
+
+- **Course Management:** Create, edit, and publish courses with chapters.
+- **Content Delivery:** Video-based learning with Mux integration.
+- **Progress Tracking:** Track user progress through chapters and courses.
+- **Authentication:** Secure user authentication with Clerk.
+- **Payment System:** Stripe integration for paid courses.
+- **Free Courses:** Support for free course enrollment.
+
+### Gamification
+
+- **XP (Experience Points) System:** Users earn XP for completing learning activities, such as finishing chapters and quizzes.
+- **Leveling System:** Users level up based on their total XP, with visual progress indicators.
+- **Achievements:** Users can unlock a variety of achievements for reaching milestones, categorized into Learning, Consistency, and Excellence.
+- **Streaks:** Daily learning streaks are tracked to encourage consistent study habits. A "streak freeze" feature is available.
+- **Leaderboards:** Time-based leaderboards (weekly, monthly, all-time) to foster friendly competition.
+- **Daily Goals:** Users have daily XP goals to encourage regular engagement.
+
+### Enhanced Assessment System
+
+- **Quiz Engine:** Teachers can create quizzes with various question types, including multiple-choice, true/false, and fill-in-the-blank.
+- **Assignments:** Teachers can create assignments with deadlines and grading rubrics.
+- **Certification:** Upon course completion, users can claim a verifiable certificate.
+
 ## Getting Started
 
 First, run the development server:

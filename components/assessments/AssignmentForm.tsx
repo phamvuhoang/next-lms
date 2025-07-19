@@ -9,13 +9,29 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RubricBuilder } from "./RubricBuilder";
+
+const rubricCriterionSchema = z.object({
+  description: z.string().min(1),
+  points: z.number().int().min(0),
+});
+
 const formSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().min(1, { message: "Description is required" }),
-  dueDate: z.string().optional(), // Consider using a date picker component
+  dueDate: z.string().optional(),
   maxPoints: z.number().int().min(0).default(100),
   allowLateSubmission: z.boolean().default(true),
   xpReward: z.number().int().min(0).default(50),
+  rubric: z.array(rubricCriterionSchema).optional(),
 });
 
 interface AssignmentFormProps {
@@ -112,6 +128,22 @@ export const AssignmentForm = ({ initialData, onSubmit, isLoading }: AssignmentF
               <FormLabel>XP Reward</FormLabel>
               <FormControl>
                 <Input type="number" disabled={isLoading} placeholder="e.g. 50" {...field} onChange={event => field.onChange(parseInt(event.target.value))} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="rubric"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <RubricBuilder
+                  initialRubric={field.value}
+                  onRubricChange={field.onChange}
+                  isLoading={isLoading}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

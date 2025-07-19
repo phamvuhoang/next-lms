@@ -7,10 +7,22 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+
+enum QuestionType {
+  MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
+  TRUE_FALSE = "TRUE_FALSE",
+  FILL_IN_THE_BLANK = "FILL_IN_THE_BLANK",
+}
+
 interface Question {
   id: string;
   question: string;
-  type: string;
+  type: QuestionType;
   options?: string[];
 }
 
@@ -47,7 +59,7 @@ export const QuizPlayer = ({ quizId, questions, onSubmit, isLoading }: QuizPlaye
         <div key={q.id} className="p-6 border rounded-lg shadow-sm space-y-4">
           <h4 className="text-lg font-semibold">{index + 1}. {q.question}</h4>
 
-          {q.type === "multiple_choice" && q.options && (
+          {q.type === QuestionType.MULTIPLE_CHOICE && q.options && (
             <RadioGroup
               onValueChange={(value) => handleAnswerChange(q.id, value)}
               disabled={isLoading}
@@ -61,7 +73,7 @@ export const QuizPlayer = ({ quizId, questions, onSubmit, isLoading }: QuizPlaye
             </RadioGroup>
           )}
 
-          {q.type === "true_false" && (
+          {q.type === QuestionType.TRUE_FALSE && (
             <RadioGroup
               onValueChange={(value) => handleAnswerChange(q.id, value)}
               disabled={isLoading}
@@ -77,7 +89,7 @@ export const QuizPlayer = ({ quizId, questions, onSubmit, isLoading }: QuizPlaye
             </RadioGroup>
           )}
 
-          {q.type === "fill_blank" && (
+          {q.type === QuestionType.FILL_IN_THE_BLANK && (
             <Input
               placeholder="Your answer"
               onChange={(e) => handleAnswerChange(q.id, e.target.value)}

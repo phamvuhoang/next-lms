@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { updateDailyGoalProgress } from "./daily-goal.service";
 
 // XP thresholds for each level (Duolingo-inspired exponential curve)
 const calculateXPForLevel = (level: number): number => {
@@ -69,6 +70,7 @@ export const awardXP = async (userId: string, amount: number, reason: string, so
   // Update streak if it's a learning activity
   if (sourceType === 'chapter' || sourceType === 'quiz' || sourceType === 'assignment') {
     await updateUserStreak(userId);
+    await updateDailyGoalProgress(userId, amount);
   }
 
   return {
@@ -100,24 +102,85 @@ export const getUserXP = async (userId: string) => {
 };
 
 export const getLeaderboard = async (timeframe: 'weekly' | 'monthly' | 'all-time' = 'all-time', limit = 50, offset = 0) => {
-  // For now, only support all-time leaderboard
-  // TODO: Implement time-based filtering with proper date ranges
-  
-  const leaderboard = await db.userXP.findMany({
-    orderBy: { totalXP: 'desc' },
-    take: limit,
-    skip: offset,
-  });
+  if (timeframe === 'all-time') {
+    const leaderboard = await db.userXP.findMany({
+      orderBy: { totalXP: 'desc' },
+      take: limit,
+      skip: offset,
+    });
 
-  const totalUsers = await db.userXP.count();
+    const totalUsers = await db.userXP.count();
 
-  return {
-    leaderboard: leaderboard.map((user, index) => ({
-      ...user,
-      rank: offset + index + 1,
-    })),
-    totalUsers,
-  };
+    return {
+      leaderboard: leaderboard.map((user, index) => ({
+        ...user,
+        rank: offset + index + 1,
+      })),
+      totalUsers,
+    };
+  } else {
+    const now = new Date();
+    let startDate: Date;
+
+    if (timeframe === 'weekly') {
+      startDate = new Date(now.setDate(now.getDate() - 7));
+    } else { // monthly
+      startDate = new Date(now.setMonth(now.getMonth() - 1));
+    }
+
+    const xpByTimeframe = await db.xPTransaction.groupBy({
+      by: ['userId'],
+      _sum: {
+        amount: true,
+      },
+      where: {
+        createdAt: {
+          gte: startDate,
+        },
+      },
+      orderBy: {
+        _sum: {
+          amount: 'desc',
+        },
+      },
+      take: limit,
+      skip: offset,
+    });
+
+    const userIds = xpByTimeframe.map(item => item.userId);
+    const users = await db.userXP.findMany({
+      where: {
+        userId: {
+          in: userIds,
+        },
+      },
+    });
+
+    const userMap = new Map(users.map(user => [user.userId, user]));
+
+    const leaderboard = xpByTimeframe.map((item, index) => {
+      const user = userMap.get(item.userId);
+      return {
+        ...user,
+        totalXP: item._sum.amount || 0,
+        rank: offset + index + 1,
+      };
+    });
+
+    const totalUsers = await db.xPTransaction.count({
+        where: {
+            createdAt: {
+                gte: startDate,
+            },
+        },
+        distinct: ['userId'],
+    });
+
+    return {
+      leaderboard,
+      totalUsers
+    };
+  }
 };
 
 export const checkAndAwardAchievements = async (userId: string, eventType: string, eventData: any) => {

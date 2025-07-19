@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import CourseSidebarItem from './course-sidebar-item'
 import { CourseProgress } from '@/components/course-progress'
+import { ClaimCertificateButton } from '@/components/gamification/ClaimCertificateButton'
 
 type CourseSidebarProps = {
   course: Prisma.CourseGetPayload<{ include: { chapters: { include: { userProgress: true } } } }>
@@ -33,6 +34,11 @@ export default async function CourseSidebar({ course, progressCount }: CourseSid
         {purchase ? (
           <div className="mt-10">
             <CourseProgress variant="success" value={progressCount} />
+            {progressCount === 100 && (
+              <div className="mt-4">
+                <ClaimCertificateButton courseId={course.id} />
+              </div>
+            )}
           </div>
         ) : null}
       </div>

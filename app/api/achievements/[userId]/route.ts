@@ -38,14 +38,44 @@ export async function GET(
     const progressTowards = [];
     for (const achievement of allAchievements) {
       if (!unlockedAchievementIds.has(achievement.id)) {
-        // TODO: Calculate actual progress based on achievement conditions
-        // For now, return placeholder data
+        const condition = achievement.condition as any;
+        let currentProgress = 0;
+        const requiredProgress = condition.count;
+
+        switch (condition.type) {
+          case 'chapter_completion':
+            currentProgress = await db.userProgress.count({
+              where: { userId, isCompleted: true },
+            });
+            break;
+          case 'quiz_completion':
+            currentProgress = await db.quizAttempt.count({ where: { userId } });
+            break;
+          case 'perfect_quiz':
+            currentProgress = await db.quizAttempt.count({
+              where: { userId, score: { gte: 100 } },
+            });
+            break;
+          case 'streak':
+            const userStreak = await db.userStreak.findUnique({ where: { userId } });
+            currentProgress = userStreak?.currentStreak || 0;
+            break;
+          case 'level':
+            const userXp = await db.userXP.findUnique({ where: { userId } });
+            currentProgress = userXp?.level || 0;
+            break;
+          case 'total_xp':
+            const userXpTotal = await db.userXP.findUnique({ where: { userId } });
+            currentProgress = userXpTotal?.totalXP || 0;
+            break;
+        }
+
         progressTowards.push({
           achievementId: achievement.id,
           achievement,
-          currentProgress: 0,
-          requiredProgress: 1,
-          percentage: 0
+          currentProgress,
+          requiredProgress,
+          percentage: Math.min(100, (currentProgress / requiredProgress) * 100),
         });
       }
     }

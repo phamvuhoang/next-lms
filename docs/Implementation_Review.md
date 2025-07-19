@@ -32,15 +32,20 @@ These are core features defined in the project's planning documents that appear 
 
 These are features that are partially implemented, or where the implementation status is unclear.
 
-### 3.1. Gamification
+### 3.1. User Flow
+- **Observation:** After completing a chapter, the user was automatically redirected to the next chapter, preventing them from taking the chapter quiz.
+- **Impact:** This was a significant flaw in the user journey, as it made chapter-specific quizzes inaccessible until the user manually navigated back.
+- **Status:** ✅ **Fixed.** The video player component now correctly redirects to the chapter quiz if one exists.
+
+### 3.2. Gamification
 - **Leaderboards:** The API and PRD specify leaderboards with "weekly", "monthly", and "all-time" timeframes. The implementation summary notes this is a "Next Step", confirming the feature is incomplete.
 - **Achievement Progress:** The API `GET /api/achievements/[userId]` is designed to show progress towards locked achievements, but it's unclear if the frontend `AchievementBadge.tsx` or a similar component visualizes this.
 - **Level-Up Celebrations:** The PRD requires visual celebrations (e.g., confetti) for level-ups. While a `use-confetti.ts` hook exists, the implementation of this feature is not confirmed in the summary.
 
-### 3.2. Assessment
+### 3.3. Assessment
 - **Quiz Question Types:** The PRD requires a wide variety of question types (MCQ, T/F, Fill-in-the-blank, Drag-and-drop, Code challenges). The implementation appears to support Multiple Choice (`radio-group.tsx`), but the status of other types is unknown. "Code challenges" are missing entirely from the design documents.
 
-### 3.3. API Design
+### 3.4. API Design
 - **Non-RESTful Routes:** The implementation uses routes like `.../freeze` and `.../submit`. While functional, a more RESTful approach would be to use `PATCH` or `POST` on the parent resource (e.g., `POST /api/streaks/[userId]` with an `{"action": "use_freeze"}` body). This is a minor point of architectural consistency to consider for the future.
 
 ## 4. Actionable Recommendations and Implementation Plan
