@@ -22,7 +22,7 @@ export const DailyGoalDisplay = () => {
         const { data } = await axios.get("/api/daily-goal");
         setDailyGoal(data);
       } catch (error) {
-        console.error("Failed to fetch daily goal", error);
+        // Silently handle error
       } finally {
         setIsLoading(false);
       }

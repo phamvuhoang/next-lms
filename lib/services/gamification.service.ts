@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { updateDailyGoalProgress } from "./daily-goal.service";
+import { clerkClient } from "@clerk/nextjs/server";
 
 // XP thresholds for each level (Duolingo-inspired exponential curve)
 const calculateXPForLevel = (level: number): number => {
@@ -16,10 +17,47 @@ const calculateCurrentLevelXP = (totalXP: number, level: number): number => {
 };
 
 const calculateXPToNextLevel = (totalXP: number, level: number): number => {
-  const nextLevelXP = calculateXPForLevel(level);
   const currentLevelXP = calculateCurrentLevelXP(totalXP, level);
   const xpNeededForCurrentLevel = calculateXPForLevel(level) - (level > 1 ? calculateXPForLevel(level - 1) : 0);
   return xpNeededForCurrentLevel - currentLevelXP;
+};
+
+const generateDisplayName = async (userId: string): Promise<string> => {
+  if (!userId) return 'Unknown User';
+  
+  try {
+    // Try to get user from Clerk
+    const clerk = await clerkClient();
+    const user = await clerk.users.getUser(userId);
+    
+    // Use email if available, otherwise fallback to generated name
+    if (user.emailAddresses && user.emailAddresses.length > 0) {
+      const email = user.emailAddresses[0].emailAddress;
+      // Show only the part before @ for privacy
+      const emailPrefix = email.split('@')[0];
+      return emailPrefix;
+    }
+    
+    // Fallback to generated name if no email
+    const shortId = userId.slice(-6);
+    const adjectives = ['Brave', 'Smart', 'Quick', 'Wise', 'Bright', 'Clever', 'Sharp', 'Brilliant'];
+    const nouns = ['Learner', 'Student', 'Scholar', 'Explorer', 'Achiever', 'Champion', 'Hero', 'Master'];
+    
+    const adjective = adjectives[userId.charCodeAt(0) % adjectives.length];
+    const noun = nouns[userId.charCodeAt(1) % nouns.length];
+    
+    return `${adjective} ${noun} #${shortId}`;
+  } catch (error) {
+    // If Clerk API fails, fallback to generated name
+    const shortId = userId.slice(-6);
+    const adjectives = ['Brave', 'Smart', 'Quick', 'Wise', 'Bright', 'Clever', 'Sharp', 'Brilliant'];
+    const nouns = ['Learner', 'Student', 'Scholar', 'Explorer', 'Achiever', 'Champion', 'Hero', 'Master'];
+    
+    const adjective = adjectives[userId.charCodeAt(0) % adjectives.length];
+    const noun = nouns[userId.charCodeAt(1) % nouns.length];
+    
+    return `${adjective} ${noun} #${shortId}`;
+  }
 };
 
 export const awardXP = async (userId: string, amount: number, reason: string, sourceType: string, sourceId?: string) => {
@@ -111,11 +149,17 @@ export const getLeaderboard = async (timeframe: 'weekly' | 'monthly' | 'all-time
 
     const totalUsers = await db.userXP.count();
 
-    return {
-      leaderboard: leaderboard.map((user, index) => ({
+    // Generate usernames for all users
+    const leaderboardWithUsernames = await Promise.all(
+      leaderboard.map(async (user, index) => ({
         ...user,
         rank: offset + index + 1,
-      })),
+        username: await generateDisplayName(user.userId),
+      }))
+    );
+
+    return {
+      leaderboard: leaderboardWithUsernames,
       totalUsers,
     };
   } else {
@@ -158,27 +202,37 @@ export const getLeaderboard = async (timeframe: 'weekly' | 'monthly' | 'all-time
 
     const userMap = new Map(users.map(user => [user.userId, user]));
 
-    const leaderboard = xpByTimeframe.map((item, index) => {
-      const user = userMap.get(item.userId);
-      return {
-        ...user,
-        totalXP: item._sum.amount || 0,
-        rank: offset + index + 1,
-      };
-    });
+    // Generate usernames for all users
+    const leaderboard = await Promise.all(
+      xpByTimeframe.map(async (item, index) => {
+        const user = userMap.get(item.userId);
+        return {
+          ...user,
+          totalXP: item._sum.amount || 0,
+          rank: offset + index + 1,
+          username: await generateDisplayName(item.userId),
+        };
+      })
+    );
 
-    const totalUsers = await db.xPTransaction.count({
+    // Count unique users by getting distinct userIds and counting them
+    const uniqueUsers = await db.xPTransaction.findMany({
         where: {
             createdAt: {
                 gte: startDate,
             },
         },
+        select: {
+            userId: true,
+        },
         distinct: ['userId'],
-    } as any);
+    });
+    
+    const totalUsers = uniqueUsers.length;
 
     return {
       leaderboard,
-      totalUsers
+      totalUsers,
     };
   }
 };

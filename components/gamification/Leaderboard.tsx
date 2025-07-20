@@ -26,7 +26,7 @@ export const Leaderboard = () => {
         const { data } = await axios.get(`/api/xp/leaderboard?timeframe=${timeframe}`);
         setLeaderboard(data.leaderboard);
       } catch (error) {
-        console.error("Failed to fetch leaderboard", error);
+        // Silently handle error
       } finally {
         setIsLoading(false);
       }

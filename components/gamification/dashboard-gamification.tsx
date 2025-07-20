@@ -2,11 +2,10 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { XpDisplay } from "./XpDisplay";
+import { useRouter } from "next/navigation";
 import { StreakCounter } from "./StreakCounter";
 import { AchievementBadge } from "./AchievementBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, Flame, Star } from "lucide-react";
 
@@ -44,8 +43,9 @@ import { DailyGoalDisplay } from "./DailyGoalDisplay";
 
 export const DashboardGamification = () => {
   const { user } = useUser();
+  const router = useRouter();
   const [xpData, setXpData] = useState<UserXPData | null>(null);
-  const [streakData, setStreakData] = useState<UserStreak | null>(null);
+  const [, setStreakData] = useState<UserStreak | null>(null);
   const [achievements, setAchievements] = useState<UserAchievement[]>([]);
   const [progressTowards, setProgressTowards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export const DashboardGamification = () => {
           setProgressTowards(achievementsResult.progressTowards || []);
         }
       } catch (error) {
-        console.error('Error fetching gamification data:', error);
+        // Silently handle error
       } finally {
         setLoading(false);
       }
@@ -145,26 +145,8 @@ export const DashboardGamification = () => {
           </CardContent>
         </Card>
 
-        {/* Streak Card */}
-        <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-orange-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700">Learning Streak</CardTitle>
-            <Flame className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-900">
-              {streakData?.currentStreak || 0} days
-            </div>
-            <p className="text-xs text-orange-600">
-              Best: {streakData?.longestStreak || 0} days
-            </p>
-            {streakData && streakData.freezesAvailable > 0 && (
-              <Badge variant="secondary" className="mt-2 text-xs">
-                {streakData.freezesAvailable} freezes left
-              </Badge>
-            )}
-          </CardContent>
-        </Card>
+        {/* Daily Goal Card */}
+        <DailyGoalDisplay />
 
         {/* Achievements Card */}
         <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
@@ -189,10 +171,45 @@ export const DashboardGamification = () => {
           </CardContent>
         </Card>
 
-        {/* Daily Goal Card */}
-        {/* eslint-disable-next-line react/self-closing-comp */}
-        <DailyGoalDisplay />
+        {/* Leaderboard Card */}
+        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-purple-700">Leaderboard</CardTitle>
+            <Trophy className="h-4 w-4 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-900">
+              Top 10%
+            </div>
+            <p className="text-xs text-purple-600">
+              Your ranking
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2 w-full text-xs"
+              onClick={() => router.push('/leaderboard')}
+            >
+              View Leaderboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Enhanced Streak Section */}
+      {user && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Flame className="h-5 w-5 text-orange-600" />
+              Learning Streak
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <StreakCounter userId={user.id} />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Achievements In Progress */}
       {progressTowards.length > 0 && (

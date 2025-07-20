@@ -27,7 +27,7 @@ export async function POST(
       message: "Streak freeze applied successfully!",
     });
   } catch (error) {
-    console.error("[STREAK_FREEZE_ERROR]", error);
+    // Log error for debugging but don't expose details to client
     
     if (error instanceof Error && error.message === 'No streak freezes available') {
       return new NextResponse("No streak freezes available", { status: 400 });

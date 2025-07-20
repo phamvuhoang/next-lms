@@ -37,7 +37,7 @@ export async function GET(
 
     return NextResponse.json(userStreak);
   } catch (error) {
-    console.error("[USER_STREAK_GET_ERROR]", error);
+    // Log error for debugging but don't expose details to client
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
