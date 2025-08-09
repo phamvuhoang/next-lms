@@ -1,7 +1,11 @@
-import Image from 'next/image'
-
 const Logo = () => {
-  return <Image src="/logo.svg" alt="logo" width={130} height={130} />
+  return (
+    <div className="flex items-center">
+      <h1 className="text-4xl font-bold text-blue-600 tracking-wide">
+        ZENEW
+      </h1>
+    </div>
+  )
 }
 
 export default Logo
